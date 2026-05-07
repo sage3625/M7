@@ -1,9 +1,12 @@
 import csv
 from schedule_item import ScheduleItem
+from search_trees import BSTMap, AVLTreeMap
 
 class Schedule:
     def __init__(self):
         self.schedule_dict = {}
+        self.bst = BSTMap()
+        self.avl = AVLTreeMap()
 
     def add_entry(self, item: ScheduleItem):
         key = item.get_key()

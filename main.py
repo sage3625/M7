@@ -56,6 +56,20 @@ def main():
         else:
             print("Invalid choice. Try again.\n")
 
+def main():
+    # Load BST version
+    bst_schedule = Schedule(backend="bst")
+    print("Loading BST schedule...")
+    bst_schedule.load_from_csv(CSV_FILE)
+    print(f"BST loaded with {bst_schedule.record_count()} records.")
+    run_menu(bst_schedule, "BST")
 
+    # Load AVL version
+    avl_schedule = Schedule(backend="avl")
+    print("Loading AVL schedule...")
+    avl_schedule.load_from_csv(CSV_FILE)
+    print(f"AVL loaded with {avl_schedule.record_count()} records.")
+    run_menu(avl_schedule, "AVL")
+    
 if __name__ == "__main__":
     main()
