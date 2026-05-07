@@ -1,0 +1,116 @@
+ScheduleItem (Data Model)
+
+Define ScheduleItem with all fields from the CSV
+Define get_key() that returns a tuple: (subject, catalog, section)
+
+Tree Backends (BSTMap and AVLTreeMap)
+
+BSTMap:
+insert(key, value):
+recursively insert into BST
+search(key):
+recursively search left or right
+inorder_items():
+recursively yield items in sorted order
+height():
+recursively compute longest path from root to leaf
+empty tree returns -1
+
+AVLTreeMap:
+insert(key, value):
+perform BST insert
+update node heights
+compute balance factor
+perform rotations if needed:
+Left-Left, Right-Right, Left-Right, Right-Left
+search(key):
+same as BST
+inorder_items():
+same as BST
+height():
+recursively compute true height ignoring stored node.height
+
+Schedule Class (Uses Either BST or AVL)
+
+Initialize Schedule(backend):
+if backend is "bst":
+create BSTMap
+else:
+create AVLTreeMap
+
+load_from_csv(filename):
+open CSV with DictReader
+for each row:
+create ScheduleItem
+insert into tree using item.get_key()
+
+print_header():
+print column titles
+
+print_all():
+print_header()
+for each item in tree.inorder_items():
+print item
+
+find_by_subject(subject):
+return all items where item.subject matches
+
+find_by_subject_catalog(subject, catalog):
+return all items where both subject and catalog match
+
+find_by_instructor(name):
+return all items where name appears in instructor field
+
+height():
+return tree.height()
+
+record_count():
+count items returned by inorder_items()
+
+Main Program
+
+main():
+ask user to choose backend: BST or AVL
+create Schedule with chosen backend
+load CSV file into schedule
+
+loop:
+show menu:
+1. Display full schedule
+2. Search by subject
+3. Search by subject + catalog
+4. Search by instructor
+5. Display tree height
+6. Quit
+
+if option 1:
+schedule.print_all()
+
+if option 2:
+ask for subject
+results = schedule.find_by_subject()
+print results
+
+if option 3:
+ask for subject and catalog
+results = schedule.find_by_subject_catalog()
+print results
+
+if option 4:
+ask for instructor substring
+results = schedule.find_by_instructor()
+print results
+
+if option 5:
+print schedule.height()
+
+if option 6:
+exit loop
+
+Overall Program Flow
+
+User chooses BST or AVL backend
+CSV loads into the selected tree
+User performs searches or prints all courses
+User can display tree height
+Program ends when user chooses to quit

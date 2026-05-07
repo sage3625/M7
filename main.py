@@ -1,60 +1,58 @@
-from schedule import load_csv
-from search_trees import _BSTNode, _AVLNode
+from schedule import Schedule
 
-def print_results(results, schedule):
-    if not results:
-        print("No matching courses found.\n")
-        return
+CSV_FILE = "courses_2023.csv"
 
-    schedule.print_header()
-    for item in results:
-        item.print()
-    print()
+def print_item(item):
+    print(f"{item.subject} {item.catalog}-{item.section} "
+          f"{item.days} {item.mtg_start}-{item.mtg_end} "
+          f"{item.instructor} (Room {item.room})")
 
-def main():
-    filename = "courses_2023.csv"
-    schedule = load_csv(filename)
-
+def run_menu(schedule, label):
     while True:
-        print("\n--- Course Schedule System ---")
-        print("1. Display full schedule")
+        print(f"\n--- Course Schedule ({label}) ---")
+        print("1. List all courses (inorder)")
         print("2. Search by subject")
         print("3. Search by subject + catalog")
-        print("4. Search by instructor last name")
+        print("4. Search by instructor")
         print("5. Display tree height")
-        print("5. Quit")
-
+        print("0. Quit this backend")
         choice = input("Enter choice: ").strip()
 
         if choice == "1":
-            schedule.print()
+            for item in schedule.inorder_items():
+                print_item(item)
+            print(f"\nTotal records: {schedule.record_count()}")
 
         elif choice == "2":
-            subject = input("Enter subject (e.g., BIO): ").strip()
-            results = schedule.find_by_subject(subject)
-            print_results(results, schedule)
+            subj = input("Subject (e.g., CSC): ")
+            results = schedule.search_by_subject(subj)
+            print(f"Found {len(results)} result(s):")
+            for item in results:
+                print_item(item)
 
         elif choice == "3":
-            subject = input("Enter subject (e.g., BIO): ").strip()
-            catalog = input("Enter catalog number (e.g., 141): ").strip()
-            results = schedule.find_by_subject_catalog(subject, catalog)
-            print_results(results, schedule)
+            subj = input("Subject (e.g., CSC): ")
+            cat = input("Catalog (e.g., 222): ")
+            results = schedule.search_by_subject_catalog(subj, cat)
+            print(f"Found {len(results)} result(s):")
+            for item in results:
+                print_item(item)
 
         elif choice == "4":
-            last_name = input("Enter instructor last name: ").strip()
-            results = schedule.find_by_instructor_last_name(last_name)
-            print_results(results, schedule)
+            instr = input("Instructor substring (e.g., 'Schaffner'): ")
+            results = schedule.search_by_instructor(instr)
+            print(f"Found {len(results)} result(s):")
+            for item in results:
+                print_item(item)
 
         elif choice == "5":
             h = schedule.height()
             print(f"Tree height (edges on longest path): {h}")
 
-        elif choice == "6":
-            print("Ending program.")
+        elif choice == "0":
             break
-
         else:
-            print("Invalid choice. Try again.\n")
+            print("Invalid choice.")
 
 def main():
     # Load BST version
@@ -70,6 +68,6 @@ def main():
     avl_schedule.load_from_csv(CSV_FILE)
     print(f"AVL loaded with {avl_schedule.record_count()} records.")
     run_menu(avl_schedule, "AVL")
-    
+
 if __name__ == "__main__":
     main()
