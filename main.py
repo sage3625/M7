@@ -1,4 +1,6 @@
-from schedule import load_csv, Schedule
+from schedule import Schedule
+
+CSV_FILE = "courses_2023.csv"
 
 def print_results(results, schedule):
     if not results:
@@ -9,7 +11,6 @@ def print_results(results, schedule):
     for item in results:
         item.print()
     print()
-
 
 def run_menu(schedule, label):
     while True:
@@ -27,37 +28,30 @@ def run_menu(schedule, label):
             schedule.print_all()
 
         elif choice == "2":
-            subject = input("Enter subject (e.g., BIO): ").strip()
-            results = schedule.find_by_subject(subject)
-            print_results(results, schedule)
+            subject = input("Enter subject: ").strip()
+            print_results(schedule.find_by_subject(subject), schedule)
 
         elif choice == "3":
-            subject = input("Enter subject (e.g., BIO): ").strip()
-            catalog = input("Enter catalog number (e.g., 141): ").strip()
-            results = schedule.find_by_subject_catalog(subject, catalog)
-            print_results(results, schedule)
+            subject = input("Enter subject: ").strip()
+            catalog = input("Enter catalog: ").strip()
+            print_results(schedule.find_by_subject_catalog(subject, catalog), schedule)
 
         elif choice == "4":
-            last_name = input("Enter instructor last name: ").strip()
-            results = schedule.find_by_instructor(last_name)
-            print_results(results, schedule)
+            last = input("Enter instructor last name: ").strip()
+            print_results(schedule.find_by_instructor(last), schedule)
 
         elif choice == "5":
-            h = schedule.height()
-            print(f"Tree height (edges on longest path): {h}")
+            print(f"Tree height: {schedule.height()}")
 
         elif choice == "6":
-            print("Ending program.")
+            print("Goodbye.")
             break
 
         else:
-            print("Invalid choice. Try again.\n")
-
+            print("Invalid choice.\n")
 
 def main():
-    filename = "courses_2023.csv"
-
-    print("\nChoose backend:")
+    print("Choose backend:")
     print("1. BST")
     print("2. AVL")
     backend_choice = input("Enter choice: ").strip()
@@ -66,11 +60,10 @@ def main():
 
     schedule = Schedule(backend=backend)
     print(f"\nLoading schedule using {backend.upper()} backend...")
-    schedule.load_from_csv(filename)
+    schedule.load_from_csv(CSV_FILE)
     print(f"Loaded {schedule.record_count()} records.")
 
     run_menu(schedule, backend.upper())
-
 
 if __name__ == "__main__":
     main()

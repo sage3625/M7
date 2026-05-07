@@ -18,7 +18,6 @@ Only implement the height() functions where marked TODO.
 # ---------------------------------------------------------
 
 class _BSTNode:
-    """Node of a Binary Search Tree."""
     __slots__ = "key", "value", "left", "right"
 
     def __init__(self, key, value):
@@ -29,33 +28,24 @@ class _BSTNode:
 
 
 class BSTMap:
-    """Unbalanced Binary Search Tree Map."""
-
     def __init__(self):
         self._root = None
 
-    # ------------------------ INSERT ------------------------
-
     def insert(self, key, value):
-        """Insert or update a key-value pair."""
         self._root = self._insert_recursive(self._root, key, value)
 
     def _insert_recursive(self, node, key, value):
         if node is None:
             return _BSTNode(key, value)
-
         if key < node.key:
             node.left = self._insert_recursive(node.left, key, value)
         elif key > node.key:
             node.right = self._insert_recursive(node.right, key, value)
         else:
-            node.value = value   # update existing key
+            node.value = value
         return node
 
-    # ------------------------ SEARCH ------------------------
-
     def search(self, key):
-        """Return the value matching key, or None if not found."""
         return self._search_recursive(self._root, key)
 
     def _search_recursive(self, node, key):
@@ -65,45 +55,24 @@ class BSTMap:
             return self._search_recursive(node.left, key)
         elif key > node.key:
             return self._search_recursive(node.right, key)
-        else:
-            return node.value
-
-    # ------------------- TRAVERSAL (INORDER) -------------------
+        return node.value
 
     def inorder_items(self):
-        """Yield (key, value) pairs in sorted order."""
         yield from self._inorder_recursive(self._root)
 
     def _inorder_recursive(self, node):
-        if node is not None:
+        if node:
             yield from self._inorder_recursive(node.left)
             yield (node.key, node.value)
             yield from self._inorder_recursive(node.right)
 
-    # ------------------------ HEIGHT ------------------------
-    # TODO: STUDENT IMPLEMENTATION REQUIRED
-    # Define height as:
-    #   -1 for an empty tree
-    #    0 for a tree with only a root node
-    #
-    # A correct, recursive implementation should compute
-    # the number of edges on the longest root-to-leaf path.
-    #
-    # def height(self):
-    #     """Return the height of the BST (students must implement)."""
-    #     pass
-    # ---------------------------------------------------------
-
+    # REQUIRED FOR PROJECT
     def height(self):
-        """Return the height of the BST (consider the longest path). Empty tree = -1."""
-        def _height(node):
+        def _h(node):
             if node is None:
                 return -1
-            left_h = _height(node.left)
-            right_h = _height(node.right)
-            return 1 + max(left_h, right_h)
-
-        return _height(self._root)
+            return 1 + max(_h(node.left), _h(node.right))
+        return _h(self._root)
 
 
 # ---------------------------------------------------------
@@ -111,7 +80,6 @@ class BSTMap:
 # ---------------------------------------------------------
 
 class _AVLNode:
-    """Node of an AVL Tree."""
     __slots__ = "key", "value", "left", "right", "height"
 
     def __init__(self, key, value):
@@ -119,16 +87,12 @@ class _AVLNode:
         self.value = value
         self.left = None
         self.right = None
-        self.height = 0   # used for AVL balancing
+        self.height = 0
 
 
 class AVLTreeMap:
-    """Self-balancing AVL Tree Map."""
-
     def __init__(self):
         self._root = None
-
-    # ------------------------ INSERT ------------------------
 
     def insert(self, key, value):
         self._root = self._insert_recursive(self._root, key, value)
@@ -142,38 +106,26 @@ class AVLTreeMap:
         elif key > node.key:
             node.right = self._insert_recursive(node.right, key, value)
         else:
-            node.value = value  # update existing
+            node.value = value
             return node
 
-        # update height
         node.height = 1 + max(self._get_height(node.left),
                               self._get_height(node.right))
 
-        # compute balance factor
         balance = self._get_balance(node)
 
-        # perform rotations if unbalanced
-        # Case 1: Left Left
         if balance > 1 and key < node.left.key:
             return self._rotate_right(node)
-
-        # Case 2: Right Right
         if balance < -1 and key > node.right.key:
             return self._rotate_left(node)
-
-        # Case 3: Left Right
         if balance > 1 and key > node.left.key:
             node.left = self._rotate_left(node.left)
             return self._rotate_right(node)
-
-        # Case 4: Right Left
         if balance < -1 and key < node.right.key:
             node.right = self._rotate_right(node.right)
             return self._rotate_left(node)
 
         return node
-
-    # ------------------------ SEARCH ------------------------
 
     def search(self, key):
         return self._search_recursive(self._root, key)
@@ -185,10 +137,7 @@ class AVLTreeMap:
             return self._search_recursive(node.left, key)
         elif key > node.key:
             return self._search_recursive(node.right, key)
-        else:
-            return node.value
-
-    # ------------------- TRAVERSAL (INORDER) -------------------
+        return node.value
 
     def inorder_items(self):
         yield from self._inorder_recursive(self._root)
@@ -199,8 +148,6 @@ class AVLTreeMap:
             yield (node.key, node.value)
             yield from self._inorder_recursive(node.right)
 
-    # ------------------- AVL UTILITIES -------------------
-
     def _get_height(self, node):
         return node.height if node else -1
 
@@ -210,62 +157,25 @@ class AVLTreeMap:
     def _rotate_left(self, z):
         y = z.right
         T2 = y.left
-
-        # perform rotation
         y.left = z
         z.right = T2
-
-        # update heights
-        z.height = 1 + max(self._get_height(z.left),
-                           self._get_height(z.right))
-        y.height = 1 + max(self._get_height(y.left),
-                           self._get_height(y.right))
-
+        z.height = 1 + max(self._get_height(z.left), self._get_height(z.right))
+        y.height = 1 + max(self._get_height(y.left), self._get_height(y.right))
         return y
 
     def _rotate_right(self, z):
         y = z.left
         T3 = y.right
-
-        # perform rotation
         y.right = z
         z.left = T3
-
-        # update heights
-        z.height = 1 + max(self._get_height(z.left),
-                           self._get_height(z.right))
-        y.height = 1 + max(self._get_height(y.left),
-                           self._get_height(y.right))
-
+        z.height = 1 + max(self._get_height(z.left), self._get_height(z.right))
+        y.height = 1 + max(self._get_height(y.left), self._get_height(y.right))
         return y
 
-    # ------------------------ HEIGHT ------------------------
-    # TODO: STUDENT IMPLEMENTATION REQUIRED
-    # Students must compute the TRUE height of the AVL tree
-    # using a recursive approach similar to the BST version.
-    #
-    # You MUST ignore the stored node.height field for the
-    # final answer—recompute height based on subtree structure.
-    #
-    # Requirements:
-    #   - empty tree: height = -1
-    #   - root only: height = 0
-    #   - compute edges on deepest path
-    #
-    # def height(self):
-    #     """Return the height of the AVL tree (students must implement)."""
-    #     pass
-    # ---------------------------------------------------------
+    # REQUIRED FOR PROJECT
     def height(self):
-        """
-        Return the TRUE height of the AVL tree (edges on deepest path).
-        Empty tree = -1, root only = 0. Ignore stored node.height field.
-        """
-        def _height(node):
+        def _h(node):
             if node is None:
                 return -1
-            left_h = _height(node.left)
-            right_h = _height(node.right)
-            return 1 + max(left_h, right_h)
-
-        return _height(self._root)
+            return 1 + max(_h(node.left), _h(node.right))
+        return _h(self._root)
