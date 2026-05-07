@@ -94,6 +94,16 @@ class BSTMap:
     #     pass
     # ---------------------------------------------------------
 
+    def height(self):
+        """Return the height of the BST (consider the longest path). Empty tree = -1."""
+        def _height(node):
+            if node is None:
+                return -1
+            left_h = _height(node.left)
+            right_h = _height(node.right)
+            return 1 + max(left_h, right_h)
+
+        return _height(self._root)
 
 
 # ---------------------------------------------------------
