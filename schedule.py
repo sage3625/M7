@@ -3,57 +3,85 @@ from schedule_item import ScheduleItem
 from search_trees import BSTMap, AVLTreeMap
 
 class Schedule:
-    def __init__(self):
-        self.schedule_dict = {}
-        self.bst = BSTMap()
-        self.avl = AVLTreeMap()
+    """
+    Course schedule that can use either BSTMap or AVLTreeMap as backend.
+    """
 
-    def add_entry(self, item: ScheduleItem):
-        key = item.get_key()
-        self.schedule_dict[key] = item
+    def __init__(self, backend="bst"):
+        if backend == "avl":
+            self._tree = AVLTreeMap()
+        else:
+            self._tree = BSTMap()
 
-    def print_header(self):
-        print(f"{'Subject':<6} {'Catalog':<7} {'Section':<8} {'Component':<10} "
-              f"{'Session':<8} {'Units':<5} {'TotEnrl':<8} {'CapEnrl':<8} Instructor")
-        print("#" * 90)
+    def load_from_csv(self, filename):
+        """
+        Load all records from CSV into the tree.
+        Assumes UTF-8-sig and DictReader as required.
+        """
+        with open(filename, newline="", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                item = ScheduleItem(
+                    subject=row.get("Subject", ""),
+                    catalog=row.get("Catalog", ""),
+                    section=row.get("Section", ""),
+                    component=row.get("Component", ""),
+                    session=row.get("Session", ""),
+                    min_units=row.get("MinUnits", ""),
+                    units=row.get("Units", ""),
+                    tot_enrl=row.get("TotEnrl", ""),
+                    cap_enrl=row.get("CapEnrl", ""),
+                    instructor=row.get("Instructor", ""),
+                    capacity=row.get("Capacity", ""),
+                    room=row.get("Room", ""),
+                    mtg_start=row.get("Mtg Start", ""),
+                    mtg_end=row.get("Mtg End", ""),
+                    days=row.get("Days", ""),
+                    start_date=row.get("Start Date", ""),
+                    end_date=row.get("End Date", ""),
+                    term=row.get("Term", ""),
+                    campus=row.get("Campus", ""),
+                    class_nbr=row.get("Class Nbr", ""),
+                    total_credits=row.get("Total Credits", ""),
+                    dup=row.get("DUP", ""),
+                    full=row.get("FULL", ""),
+                    over=row.get("OVER", "")
+                )
+                self._tree.insert(item.key, item)
 
-    def print(self):
-        self.print_header()
-        for item in self.schedule_dict.values():
-            item.print()
+    def record_count(self):
+        return sum(1 for _ in self._tree.inorder_items())
 
-    def find_by_subject(self, subject):
-        return [item for item in self.schedule_dict.values()
-                if item.subject.upper() == subject.upper()]
+    def inorder_items(self):
+        for _, item in self._tree.inorder_items():
+            yield item
 
-    def find_by_subject_catalog(self, subject, catalog):
-        return [item for item in self.schedule_dict.values()
-                if item.subject.upper() == subject.upper()
-                and item.catalog.upper() == catalog.upper()]
+    def height(self):
+        return self._tree.height()
 
-    def find_by_instructor_last_name(self, last_name):
-        return [item for item in self.schedule_dict.values()
-                if last_name.lower() in item.instructor.lower()]
+    # ------------------- SEARCH HELPERS -------------------
 
+    def search_by_subject(self, subject):
+        subject = subject.strip()
+        results = []
+        for _, item in self._tree.inorder_items():
+            if item.subject.strip() == subject:
+                results.append(item)
+        return results
 
-def load_csv(filename):
-    schedule = Schedule()
+    def search_by_subject_catalog(self, subject, catalog):
+        subject = subject.strip()
+        catalog = catalog.strip()
+        results = []
+        for _, item in self._tree.inorder_items():
+            if item.subject.strip() == subject and item.catalog.strip() == catalog:
+                results.append(item)
+        return results
 
-    with open(filename, encoding="utf-8-sig", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-
-        for row in reader:
-            item = ScheduleItem(
-                subject=row["Subject"],
-                catalog=row["Catalog"],
-                section=row["Section"],
-                component=row["Component"],
-                session=row["Session"],
-                units=int(row["Units"]),
-                tot_enrl=int(row["TotEnrl"]),
-                cap_enrl=int(row["CapEnrl"]),
-                instructor=row["Instructor"]
-            )
-            schedule.add_entry(item)
-
-    return schedule
+    def search_by_instructor(self, instructor_substr):
+        instructor_substr = instructor_substr.lower().strip()
+        results = []
+        for _, item in self._tree.inorder_items():
+            if instructor_substr in item.instructor.lower():
+                results.append(item)
+        return results
