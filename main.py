@@ -1,4 +1,5 @@
 from schedule import load_csv
+from search_trees import _BSTNode, _AVLNode
 
 def print_results(results, schedule):
     if not results:
