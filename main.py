@@ -12,7 +12,7 @@ def print_results(results, schedule):
     print()
 
 def main():
-    filename = "STEM - Summer 2022 Schedule of Classes as of 05-02-22.csv"
+    filename = "courses_2023.csv"
     schedule = load_csv(filename)
 
     while True:
@@ -21,6 +21,7 @@ def main():
         print("2. Search by subject")
         print("3. Search by subject + catalog")
         print("4. Search by instructor last name")
+        print("5. Display tree height")
         print("5. Quit")
 
         choice = input("Enter choice: ").strip()
@@ -45,6 +46,10 @@ def main():
             print_results(results, schedule)
 
         elif choice == "5":
+            h = schedule.height()
+            print(f"Tree height (edges on longest path): {h}")
+
+        elif choice == "6":
             print("Ending program.")
             break
 
